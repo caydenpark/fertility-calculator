@@ -194,10 +194,82 @@ const FertilityCalculator = () => {
   const BASE_POPULATION = 100;
   const MAX_BAR_WIDTH = 65;
 
+    // Calculate population projections
+    const calculateProjections = () => {
+      const numGenerations = 4;
+      const generations = [];
+      const replacementRate = 2.1;
+      
+      const deviation = (fertilityRate / replacementRate) - 1;
+      const percentValue = (deviation * 100).toFixed(0);
+      setReplacementPercent(`${percentValue}%`);
+      setIsPositiveDeviation(deviation >= 0);
+      
+      let maxPopulation = BASE_POPULATION;
+      let populations = [BASE_POPULATION];
+      
+      let currentPop = BASE_POPULATION;
+      for (let i = 1; i <= numGenerations; i++) {
+        const fertilityRateFactor = fertilityRate / 2.1;
+        currentPop = Math.round(currentPop * fertilityRateFactor);
+        populations.push(currentPop);
+        if (currentPop > maxPopulation) {
+          maxPopulation = currentPop;
+        }
+      }
+      
+      const finalPopulation = populations[populations.length - 1];
+      const changePercent = ((finalPopulation - BASE_POPULATION) / BASE_POPULATION * 100).toFixed(0);
+      
+      if (parseFloat(changePercent) < 0) {
+        setPopulationChange(`This country will lose ${Math.abs(parseFloat(changePercent))}% of their population in four generations.`);
+      } else if (parseFloat(changePercent) > 0) {
+        setPopulationChange(`This country will gain ${changePercent}% in population over four generations.`);
+      } else {
+        setPopulationChange(`This country will maintain its population over four generations.`);
+      }
+      
+      const currentYear = new Date().getFullYear();
+      
+      generations.push({ 
+        generation: currentYear.toString(), 
+        population: populations[0], 
+        width: (populations[0] / maxPopulation) * MAX_BAR_WIDTH
+      });
+      
+      for (let i = 1; i <= numGenerations; i++) {
+        generations.push({ 
+          generation: (currentYear + (i * generationYears)).toString(), 
+          population: populations[i], 
+          width: (populations[i] / maxPopulation) * MAX_BAR_WIDTH
+        });
+      }
+      
+      setPopulationData(generations);
+    };
+
+  // Update countries list based on current fertility rate
+  const updateCountriesList = (rate: number) => {
+    if (viewMode === 'similar') {
+      const similarCountries = countryFertilityData
+        .filter(country => Math.abs(country.fertility - rate) < 0.05)
+        .sort((a, b) => Math.abs(a.fertility - rate) - Math.abs(b.fertility - rate));
+      setCountries(similarCountries);
+    } else {
+      let filteredCountries = countryFertilityData;
+      if (searchTerm) {
+        filteredCountries = countryFertilityData.filter(country => 
+          country.country.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+      setCountries(filteredCountries);
+    }
+  };
+
   useEffect(() => {
     calculateProjections();
     updateCountriesList(fertilityRate);
-  }, [fertilityRate, generationYears, viewMode, searchTerm]);
+  }, [fertilityRate, generationYears, viewMode, searchTerm, calculateProjections, updateCountriesList]);
 
   // Handle input text changes for fertility rate
   const handleInputChange = (e: { target: { value: any; }; }) => {
@@ -238,78 +310,6 @@ const FertilityCalculator = () => {
   const handleYearsChange = (value: number) => {
     const newValue = Math.max(1, Math.min(50, value));
     setGenerationYears(newValue);
-  };
-
-  // Calculate population projections
-  const calculateProjections = () => {
-    const numGenerations = 4;
-    const generations = [];
-    const replacementRate = 2.1;
-    
-    const deviation = (fertilityRate / replacementRate) - 1;
-    const percentValue = (deviation * 100).toFixed(0);
-    setReplacementPercent(`${percentValue}%`);
-    setIsPositiveDeviation(deviation >= 0);
-    
-    let maxPopulation = BASE_POPULATION;
-    let populations = [BASE_POPULATION];
-    
-    let currentPop = BASE_POPULATION;
-    for (let i = 1; i <= numGenerations; i++) {
-      const fertilityRateFactor = fertilityRate / 2.1;
-      currentPop = Math.round(currentPop * fertilityRateFactor);
-      populations.push(currentPop);
-      if (currentPop > maxPopulation) {
-        maxPopulation = currentPop;
-      }
-    }
-    
-    const finalPopulation = populations[populations.length - 1];
-    const changePercent = ((finalPopulation - BASE_POPULATION) / BASE_POPULATION * 100).toFixed(0);
-    
-    if (parseFloat(changePercent) < 0) {
-      setPopulationChange(`This country will lose ${Math.abs(parseFloat(changePercent))}% of their population in four generations.`);
-    } else if (parseFloat(changePercent) > 0) {
-      setPopulationChange(`This country will gain ${changePercent}% in population over four generations.`);
-    } else {
-      setPopulationChange(`This country will maintain its population over four generations.`);
-    }
-    
-    const currentYear = new Date().getFullYear();
-    
-    generations.push({ 
-      generation: currentYear.toString(), 
-      population: populations[0], 
-      width: (populations[0] / maxPopulation) * MAX_BAR_WIDTH
-    });
-    
-    for (let i = 1; i <= numGenerations; i++) {
-      generations.push({ 
-        generation: (currentYear + (i * generationYears)).toString(), 
-        population: populations[i], 
-        width: (populations[i] / maxPopulation) * MAX_BAR_WIDTH
-      });
-    }
-    
-    setPopulationData(generations);
-  };
-
-  // Update countries list based on current fertility rate
-  const updateCountriesList = (rate: number) => {
-    if (viewMode === 'similar') {
-      const similarCountries = countryFertilityData
-        .filter(country => Math.abs(country.fertility - rate) < 0.05)
-        .sort((a, b) => Math.abs(a.fertility - rate) - Math.abs(b.fertility - rate));
-      setCountries(similarCountries);
-    } else {
-      let filteredCountries = countryFertilityData;
-      if (searchTerm) {
-        filteredCountries = countryFertilityData.filter(country => 
-          country.country.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      }
-      setCountries(filteredCountries);
-    }
   };
 
   // Handle search functionality

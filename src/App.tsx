@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import FertilityCalculator from './components/fixed-fertility-calculator';
 import './App.css';
 
