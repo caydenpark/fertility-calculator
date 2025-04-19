@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const FertilityCalculator = () => {
@@ -15,7 +15,7 @@ const FertilityCalculator = () => {
   const [chartType, setChartType] = useState('bar');
 
   // Country fertility data - updated with 2024 United Nations Population Bureau data
-  const countryFertilityData = [
+  const countryFertilityData = useMemo(() => [
     { country: "Afghanistan", fertility: 4.12, flag: "🇦🇫" },
     { country: "Albania", fertility: 1.32, flag: "🇦🇱" },
     { country: "Algeria", fertility: 2.90, flag: "🇩🇿" },
@@ -189,7 +189,7 @@ const FertilityCalculator = () => {
     { country: "Yemen", fertility: 3.65, flag: "🇾🇪" },
     { country: "Zambia", fertility: 4.50, flag: "🇿🇲" },
     { country: "Zimbabwe", fertility: 3.50, flag: "🇿🇼" }
-  ];
+  ], []);
 
   const BASE_POPULATION = 100;
   const MAX_BAR_WIDTH = 65;
