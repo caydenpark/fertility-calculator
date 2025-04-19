@@ -6,11 +6,9 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <main className="w-full max-w-md">
+        <main>
           <FertilityCalculator />
         </main>
-      </header>
     </div>
   );
 }
