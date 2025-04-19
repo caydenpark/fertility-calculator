@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const FertilityCalculator = () => {
@@ -195,7 +195,7 @@ const FertilityCalculator = () => {
   const MAX_BAR_WIDTH = 65;
 
     // Calculate population projections
-    const calculateProjections = () => {
+    const calculateProjections = useCallback(() => {
       const numGenerations = 4;
       const generations = [];
       const replacementRate = 2.1;
@@ -246,10 +246,10 @@ const FertilityCalculator = () => {
       }
       
       setPopulationData(generations);
-    };
+    }, [fertilityRate, generationYears]);
 
   // Update countries list based on current fertility rate
-  const updateCountriesList = (rate: number) => {
+  const updateCountriesList = useCallback((rate: number) => {
     if (viewMode === 'similar') {
       const similarCountries = countryFertilityData
         .filter(country => Math.abs(country.fertility - rate) < 0.05)
@@ -264,7 +264,7 @@ const FertilityCalculator = () => {
       }
       setCountries(filteredCountries);
     }
-  };
+  }, [viewMode, countryFertilityData, searchTerm]);
 
   useEffect(() => {
     calculateProjections();
