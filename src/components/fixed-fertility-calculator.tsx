@@ -466,10 +466,10 @@ const FertilityCalculator = () => {
         <div className="mt-4 text-base">
           Replacement Fertility Rate is 2.1
         </div>
-        <div className="mt-1 text-base">
+        <div className="text-base">
           Starting with a current population of 100
         </div>
-        <div className="mt-1 text-base">
+        <div className="text-base">
           {populationChange}
         </div>
         
