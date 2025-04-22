@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const FertilityCalculator = () => {
+  const [mobileView, setMobileView] = useState<"calculator" | "countries">("calculator");
   const [fertilityRate, setFertilityRate] = useState(2.10);
   const [fertilityInput, setFertilityInput] = useState('2.10');
   const [generationYears, setGenerationYears] = useState(25);
@@ -405,8 +406,38 @@ const FertilityCalculator = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="border-2 border-black p-6">
-        <h1 className="text-4xl font-bold text-center mb-8">Total Fertility Rate Calculator</h1>
+        <h1 className="block md:hidden text-4xl font-bold text-center mb-4">
+          Fertility Rate Calculator
+        </h1>
+        <h1 className="hidden md:block text-4xl font-bold text-center mb-8">
+          Total Fertility Rate Calculator
+        </h1>
+
+        {/* only on small screens */}
+        <div className="flex w-full mb-6 md:hidden">
+          <button
+            className={`flex-1 py-2 rounded ${
+              mobileView === "calculator"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setMobileView("calculator")}
+          >
+            Calculator
+          </button>
+          <button
+            className={`flex-1 py-2 rounded ${
+              mobileView === "countries"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+            onClick={() => setMobileView("countries")}
+          >
+            Countries
+          </button>
+        </div>
         
+        <div className={`${mobileView === "calculator" ? "block" : "hidden"} md:block`}>
         <div className="flex items-center mb-4">
           <div className="w-1/4 text-right pr-4 text-lg font-bold">Fertility Rate</div>
           <div className="w-20 h-10 bg-yellow-200 border border-black text-center flex items-center justify-center text-xl">
@@ -483,11 +514,13 @@ const FertilityCalculator = () => {
               {getChartToggleText()}
             </button>
           </div>
-          <div className="w-full">
+          <div className="w-full mt-6">
             {chartType === 'line' ? renderLineChart() : renderBarChart()}
           </div>
         </div>
-        
+        </div>
+
+        <div className={`${mobileView === "countries" ? "block" : "hidden"} md:block`}>
         <div className="mt-6 pt-4 border-t border-gray-300">
           <div className="flex justify-between items-center mb-3">
             <div className="font-bold text-lg">Countries by Fertility Rate</div>
@@ -521,6 +554,7 @@ const FertilityCalculator = () => {
               <CountryItem key={index} country={country} />
             ))}
           </div>
+        </div>
         </div>
         
         <div className="mt-5 flex justify-between items-center text-sm">
