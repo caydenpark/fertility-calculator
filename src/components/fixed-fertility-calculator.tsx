@@ -14,6 +14,7 @@ const FertilityCalculator = () => {
   const [countries, setCountries] = useState<{ country: string; fertility: number; flag: string }[]>([]);
   const [viewMode, setViewMode] = useState('similar');
   const [chartType, setChartType] = useState('bar');
+  const [sortMethod, setSortMethod] = useState('fertility-high'); // 'fertility-high', 'fertility-low', or 'alphabetical'
 
   // Country fertility data - updated with 2024 United Nations Population Bureau data
   const countryFertilityData = useMemo(() => [
@@ -263,14 +264,24 @@ const FertilityCalculator = () => {
           country.country.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
+
+      // Apply sorting
+      if (sortMethod === 'alphabetical') {
+        filteredCountries = [...filteredCountries].sort((a, b) => a.country.localeCompare(b.country));
+      } else if (sortMethod === 'fertility-high') {
+        filteredCountries = [...filteredCountries].sort((a, b) => b.fertility - a.fertility);
+      } else if (sortMethod === 'fertility-low') {
+        filteredCountries = [...filteredCountries].sort((a, b) => a.fertility - b.fertility);
+      }
+
       setCountries(filteredCountries);
     }
-  }, [viewMode, countryFertilityData, searchTerm]);
+  }, [viewMode, countryFertilityData, searchTerm, sortMethod]);
 
   useEffect(() => {
     calculateProjections();
     updateCountriesList(fertilityRate);
-  }, [fertilityRate, generationYears, viewMode, searchTerm, calculateProjections, updateCountriesList]);
+  }, [fertilityRate, generationYears, viewMode, searchTerm, sortMethod, calculateProjections, updateCountriesList]);
 
   // Handle input text changes for fertility rate
   const handleInputChange = (e: { target: { value: any; }; }) => {
@@ -324,6 +335,11 @@ const FertilityCalculator = () => {
     if (event.target.value === 'all') {
       setSearchTerm('');
     }
+  };
+
+  // Handle sort method change
+  const handleSortMethodChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setSortMethod(event.target.value);
   };
 
   // Select a country and update fertility rate
@@ -537,19 +553,34 @@ const FertilityCalculator = () => {
           </div>
           
           {viewMode === 'all' && (
-            <div className="flex items-center mb-3">
-              <span className="mr-2">Search:</span>
-              <input 
-                type="text" 
-                className="px-2 py-1 border border-gray-300 rounded w-52"
-                placeholder="Type to filter countries..."
-                value={searchTerm}
-                onChange={handleSearch}
-              />
+            <div className="flex flex-col md:flex-row flex-wrap items-start md:items-center mb-3 gap-2">
+              <div className="flex flex-col md:flex-row items-start md:items-center w-full md:w-auto">
+                <span className="mr-2 mb-1 md:mb-0">Search:</span>
+                <input 
+                  type="text" 
+                  className="w-full md:w-52 px-2 py-1 border border-gray-300 rounded"
+                  placeholder="Type to filter countries..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
+              <div className="flex flex-col md:flex-row items-start md:items-center w-full md:w-auto md:ml-auto">
+                <label htmlFor="sortMethod" className="mr-2 mb-1 md:mb-0 text-sm">Sort by:</label>
+                <select 
+                  id="sortMethod"
+                  className="w-full md:w-auto px-2 py-1 border border-gray-300 rounded bg-gray-100"
+                  value={sortMethod}
+                  onChange={handleSortMethodChange}
+                >
+                  <option value="fertility-high">Fertility (High to Low)</option>
+                  <option value="fertility-low">Fertility (Low to High)</option>
+                  <option value="alphabetical">Country Name (A-Z)</option>
+                </select>
+              </div>
             </div>
           )}
           
-          <div className="flex flex-wrap gap-3 max-h-72 overflow-y-auto p-2 border border-gray-200 rounded">
+          <div className="flex flex-wrap gap-2 md:gap-3 max-h-60 md:max-h-72 overflow-y-auto p-2 border border-gray-200 rounded">
             {countries.map((country, index) => (
               <CountryItem key={index} country={country} />
             ))}
