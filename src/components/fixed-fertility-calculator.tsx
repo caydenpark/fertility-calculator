@@ -454,8 +454,8 @@ const FertilityCalculator = () => {
         </div>
         
         <div className={`${mobileView === "calculator" ? "block" : "hidden"} md:block`}>
-        <div className="flex items-center mb-4">
-          <div className="w-1/4 text-right pr-4 text-lg font-bold">Fertility Rate</div>
+        <div className="mb-4">
+          <div className="text-left text-lg font-bold mb-1">Fertility Rate</div>
           <div className="w-20 h-10 bg-yellow-200 border border-black text-center flex items-center justify-center text-xl">
             <input 
               type="text" 
@@ -465,7 +465,7 @@ const FertilityCalculator = () => {
               onBlur={handleInputBlur}
             />
           </div>
-          <div className="flex-1 flex items-center px-2">
+          <div className="flex-1 flex items-center px-2 pt-4">
             <button 
               className="w-8 h-8 bg-gray-200 border border-gray-400 flex items-center justify-center font-bold"
               onClick={() => handleFertilityChange(fertilityRate - 0.01)}
@@ -489,9 +489,13 @@ const FertilityCalculator = () => {
             </button>
           </div>
         </div>
+          
+        <div className={`text-xl font-bold my-4 text-center ${isPositiveDeviation ? 'text-green-600' : 'text-red-600'}`}>
+          {replacementPercent} {isPositiveDeviation ? 'Above replacement' : 'Below replacement'}
+        </div>
         
-        <div className="flex items-center mb-6">
-          <div className="w-1/4 text-right pr-4 text-lg font-bold">Generation Years</div>
+        <div className="mb-6">
+          <div className="text-left text-lg font-bold mb-1">Generation Years</div>
           <div className="w-20 h-10 bg-yellow-200 border border-black text-center flex items-center justify-center text-xl">
             <input 
               type="number" 
@@ -502,11 +506,6 @@ const FertilityCalculator = () => {
               step="1"
               onChange={(e) => handleYearsChange(parseInt(e.target.value))}
             />
-          </div>
-          <div className="flex-1 flex items-center justify-end">
-            <div className={`text-xl font-bold ${isPositiveDeviation ? 'text-green-600' : 'text-red-600'}`}>
-              {replacementPercent} {isPositiveDeviation ? 'Above replacement' : 'Below replacement'}
-            </div>
           </div>
         </div>
         
